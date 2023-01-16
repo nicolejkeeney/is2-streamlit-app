@@ -7,7 +7,7 @@ This repository contains code and files for building a streamlit application to 
 1) I think you need to be an owner of the repository to build it on Streamlit's cloud, so you will need to fork the repo.
 2) Create an account on [Streamlit.io](https://streamlit.io/)
 3) Deploy the app. You'll need to choose app.py as the application you want to built 
-4) Voila! You're app should be up and running.
+4) Voila! Your app should be up and running.
 
 <img width="500" alt="bokeh_app" src="static/deploy_app.png">
 
@@ -23,6 +23,7 @@ This application uses **streamlit's native widgets** (sliders and dropdowns) to 
 
 
 ### app_html.py 
+**I am able to run this application easily locally but run into an undecipherable error message when trying to run in on Streamlit.io.** 
 This application uses **bokeh's widgets** (sliders and dropdowns) to display the user options, and outputs a map that is rendered using **html**. This app takes forever to load, because all the options are pre-loaded before they are displayed-- meaning, all variable options AND timesteps! Because of this, in the code you'll see I've only included a small subset of variable and time options. Within the app, the map is outputted to html, then just kind of shoved into streamlit's framework to display it. I think this also (negatively) impacts performance. But, it sure looks nice once it's all loaded! 
 
 <img width="550" alt="html_app" src="static/html_app.png">
