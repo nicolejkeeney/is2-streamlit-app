@@ -1,11 +1,17 @@
 # ICESat-2 sea ice thickness data dashboard 
 
-This repository contains code and files for building a streamlit application to visualize ICESat-2 sea ice gridded data. It reads in the data as zarr files from an S3 bucket, then produces a map with user options, all within the streamlit framework.
+This repository contains code and files for building a streamlit application to visualize ICESat-2 sea ice gridded data. It reads in the data as zarr files from an S3 bucket, then produces a map with user options, all within the streamlit framework. I tried to document this as best as a could but please feel free to reach out if you need any help deciphering the code!
 
-## Building the streamlit app from this repository 
+## Deploying the app on Streamlit.io 
+
 1) I think you need to be an owner of the repository to build it on Streamlit's cloud, so you will need to fork the repo.
 2) Create an account on [Streamlit.io](https://streamlit.io/)
-3) Deploy the app. You'll need to choose the application file to use: app.py or app_html.py (see the next section for more info on these files).  
+3) Deploy the app. You'll need to choose app.py as the application you want to built 
+4) Voila! You're app should be up and running.
+
+<img width="500" alt="bokeh_app" src="static/deploy_app.png">
+
+**A note:** Streamlit will "put your app to sleep" after a certain amount of time (maybe 1 week?) if no one has opened it. Then it will rebuilt the entire app the next time the web page is opened. Very annoying!
 
 ## The two files: app.py and app_html.py 
 These are both streamlit applications that serve the same purpose through different methods. They utilize the same helper functions in the utils folder. Between the two, my preference is for app.py.
@@ -13,14 +19,13 @@ These are both streamlit applications that serve the same purpose through differ
 ### app.py
 This application uses **streamlit's native widgets** (sliders and dropdowns) to display the user options, and outputs a map that is rendered using **bokeh**. This app has better functionality with streamlit, I think, and can be more easily scaled to improve performace. The bottleneck with speed for this app appears to be streamlit's resources; when running this locally, it's quite fast, but when running it in streamlit's cloud, it's obnoxiously slow. If you could connect to AWS's compute resources, this could maybe run quite fast as a web app. 
 
-
-<img width="900" alt="bokeh_app" src="https://user-images.githubusercontent.com/66140951/212747048-9c9e0f0d-84c8-4b5f-9a29-5e842de0d9b7.png">
+<img width="900" alt="bokeh_app" src="static/bokeh_app.png">
 
 
 ### app_html.py 
 This application uses **bokeh's widgets** (sliders and dropdowns) to display the user options, and outputs a map that is rendered using **html**. This app takes forever to load, because all the options are pre-loaded before they are displayed-- meaning, all variable options AND timesteps! Because of this, in the code you'll see I've only included a small subset of variable and time options. Within the app, the map is outputted to html, then just kind of shoved into streamlit's framework to display it. I think this also (negatively) impacts performance. But, it sure looks nice once it's all loaded! 
 
-<img width="550" alt="html_app" src="https://user-images.githubusercontent.com/66140951/212747728-fd4aec30-92f1-4eb1-8392-82dfc32c1600.png">
+<img width="550" alt="html_app" src="static/html_app.png">
 
 
 ## The computational environment 
@@ -31,7 +36,7 @@ At the time of writing (Jan 2023), Streamlit was unable to build my conda enviro
 ### How to build the conda environment locally
 To create the environment, run the following in the command line: 
 ```
-conda env create -f environment.yml
+conda env create -f conda_env/conda_env.yml
 ```
 To activate the environment, run the following in the command line: 
 ```
@@ -47,7 +52,7 @@ I have a Mac. I'm unsure if these instructions would work on other OS (I assume 
 4) Activate environment: `source venv/bin/activate`
 5) Install packages from requirements.txt: `python3 -m pip install -r requirements.txt`
 
-Anytime you want to activate the environment, just run step 4 in your terminal. And, voila! 
+Anytime you want to activate the environment, just run step 4 in your terminal. 
 
 
 
