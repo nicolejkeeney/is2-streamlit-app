@@ -2,6 +2,10 @@
 
 This repository contains code and files for building a streamlit application to visualize ICESat-2 sea ice gridded data. The application file is `app.py`, and it successfully runs both locally and on Streamlit.io (at least, in my experience!). It reads in the data as zarr files from the S3 bucket, then produces a map with user options, all within the streamlit framework. There is a second file, `app_html.py` that does the same as `app.py` but using a different method, but I was only able to get this running locally, and not on Streamlit.io. <br><br>I tried to document everything as best as a could but please feel free to reach out if you need any help deciphering the code!
 
+
+## Deploying the app locally 
+It's quite easy to deploy the app locally once you have set up the environment (instructions for how to build the environment are at the bottom). From the main directory, run the following in terminal: `streamlit run app.py`. Just replace app.py with app_html.py if you'd like to run the alternative application. 
+
 ## Deploying the app on Streamlit.io 
 
 1) I think you need to be an owner of the repository to build it on Streamlit's cloud, so you will need to fork the repo.
