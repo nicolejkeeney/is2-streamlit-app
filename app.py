@@ -84,7 +84,6 @@ def make_map_bokeh(data, variable="ice_thickness", time="Jan-01 2019", dynamic=F
         dynamic=dynamic, 
         title=title,
     )
-    hv.output(widget_location="bottom") # Put time slider below the map 
     sys.stdout.write("complete!")
     return arctic_map
 
