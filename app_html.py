@@ -36,57 +36,37 @@ st.set_page_config(
 # It's quite large 
 # st.title(app_title)
 
-def make_holomap(da,variable,title=None): 
-    """ Make holomap for dashboard
-    NOTE: The clabel does not work :( 
-    
-    Args: 
-        da (xr.DataArray): data to plot 
-        variable (str): variable to plot; must be valid variable name in ds 
-    Returns: 
-        pl (holomap): plot 
-    """
-    # Get colorbar limits, cmap, and clabel 
-    # This is a helper function in plotting_utils.py 
-    clim, cmap, clabel = get_plot_settings_by_var(variable, da)
-    
-    # Create plot 
-    # title = "variable: "+long_name+", time: "+time_str
-    pl = da.hvplot.quadmesh(y="latitude", x="longitude", 
-         projection=ccrs.NorthPolarStereo(central_longitude=-45), 
-         features=["coastline"], colorbar=True, clim=clim, cmap=cmap, 
-         project=True, ylim=(60,90), frame_width=500, dynamic=False, title=title) 
-    return(pl)
-
-def make_map_html(data): 
+def make_map_html(data, variable): 
     """Make a basic map of the data 
     
     Args: 
         data (xr.Dataset): data with all variables and timesteps
+        variable (str): variable to plot 
     Regards: 
         arctic_map (Holomap): map 
         
     """
     sys.stdout.write("\nMaking Arctic map...")
 
-    # I need to use just a small subset of the total variable and time options 
-    # This holomap takes FOREVER to load with many options 
-    # I've tried tinkering with it to improve performace with no success
-    var_options = [
-        'freeboard_int','ice_thickness_int','ice_type'
-    ]
-    time_options = list(data.time.values)[:6] 
+    to_plot = data[variable]
+    # When developing sometimes I just limit the number of timesteps 
+    # Very slow to load with all timesteps 
+    to_plot = to_plot.isel(time=[0,1,2,3,4,5,6])
+    clim, cmap, clabel = get_plot_settings_by_var(variable, to_plot)
 
     # Make map with inputs 
-    arctic_map = hv.HoloMap(
-        {(i, j): make_holomap(data.sel(time=i)[j], j, title="time: "+pd.to_datetime(i).strftime("%m-%Y")+", variable: "+data[j].attrs["long_name"]) 
-        for i in time_options
-        for j in var_options}, 
-        kdims = [hv.Dimension(('i', 'time')), hv.Dimension(('j', 'variable'))]
-    ) 
-    
+    arctic_map = to_plot.hvplot.quadmesh(
+        y="latitude", x="longitude", 
+        clim=clim, clabel=clabel, 
+        projection=ccrs.NorthPolarStereo(central_longitude=-45),
+        features=["coastline"], 
+        cmap=cmap,
+        project=True, 
+        ylim=(60,90),
+    )
     hv.output(widget_location="bottom") # Put time slider below the map 
     sys.stdout.write("complete!")
+    
     return arctic_map
 
 def main(is2_ds): 
@@ -98,7 +78,27 @@ def main(is2_ds):
         streamlit app generated 
     """
 
-    arctic_map = make_map_html(is2_ds)
+    # Copied from app.py
+    # See app.py for more documentation on this part  
+    st.sidebar.markdown("Choose your date and variable of interest, and the map will automatically update.")
+    var_options = [
+        'freeboard','freeboard_int','ice_thickness',
+        'ice_thickness_int','ice_thickness_unc','ice_type','mean_day_of_month',
+        'num_segments','sea_ice_conc','snow_depth','snow_depth_int'
+    ]
+    var_options_long_name = [
+        is2_ds[var].long_name for var in var_options
+    ] 
+    var_dict = dict(zip(var_options_long_name, var_options))
+    chosen_var = st.sidebar.selectbox("Variable", var_options_long_name)
+    map_input_var = var_dict[chosen_var]
+    var_description = st.sidebar.markdown(is2_ds[map_input_var].description)
+
+    # -------- WITH THE SELECTED OPTIONS, MAKE THE ARCTIC MAP --------
+    arctic_map = make_map_html(
+        data=is2_ds,
+        variable=map_input_var
+    )
 
     # Display map in app
     # Render to html
